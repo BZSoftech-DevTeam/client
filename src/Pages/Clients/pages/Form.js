@@ -29,14 +29,13 @@ function Form() {
     const [fileData, setFileData] = useState(null);
     const [progress, setProgress] = useState(0);
     const [uploading, setUploading] = useState(false);
-    const [chartType, setChartType] = useState('line'); // 'line', 'bar'
+    const [chartType, setChartType] = useState('line'); // 'line', 'bar', 'spline'
     const [chartData, setChartData] = useState(null);
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
         if (!file) return;
 
-        // Only allow JSON or CSV files
         if (file.type !== 'application/json' && !file.name.endsWith('.csv')) {
             alert('Please upload a valid JSON or CSV file');
             return;
@@ -47,27 +46,20 @@ function Form() {
             const fileContent = reader.result;
             try {
                 const jsonData = JSON.parse(fileContent);
-
-                // Simulate a progress bar for file upload
                 setUploading(true);
                 let uploadProgress = 0;
-
-                // Use setTimeout to simulate progress
                 const simulateUpload = () => {
                     uploadProgress += 10;
                     setProgress(uploadProgress);
-
                     if (uploadProgress < 100) {
-                        setTimeout(simulateUpload, 300); // Simulate upload every 300ms
+                        setTimeout(simulateUpload, 300);
                     } else {
-                        // When progress reaches 100%, set file data
                         setFileData(jsonData);
-                        setUploading(false); // End uploading state
-                        generateChartData(jsonData); // Generate chart data
+                        setUploading(false);
+                        generateChartData(jsonData);
                     }
                 };
-
-                simulateUpload(); // Start simulated upload
+                simulateUpload();
             } catch (error) {
                 console.error('Invalid JSON format:', error);
                 alert('Failed to parse JSON file. Please upload a valid JSON file.');
@@ -84,11 +76,8 @@ function Form() {
         setChartType('line');
     };
 
-    // Function to generate chart data based on file data
     const generateChartData = (jsonData) => {
         const labels = jsonData[0]?.data?.[0]?.data.map((_, index) => `Month ${index + 1}`);
-
-        // Create dataset for chart
         const datasets = jsonData.flatMap((category) =>
             category.data.map((item) => ({
                 label: item.label,
@@ -112,6 +101,7 @@ function Form() {
 
     return (
         <div>
+            {/* File upload logic */}
             {!fileData && !uploading ? (
                 <div className="w-full mb-5">
                     <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center py-9 w-full border border-gray-300 border-dashed rounded cursor-pointer bg-gray-50">
@@ -149,7 +139,7 @@ function Form() {
 
             {fileData && !uploading && (
                 <div>
-                    <button onClick={handleUploadAgain} className="mb-4 px-4 py-2 bg-gradient-to-tl from-blue-600 to-violet-600 text-white rounded-md">Upload Again</button>
+                    <button onClick={handleUploadAgain} className="mb-4 px-4 py-2 bg-gradient-to-tl from-blue-600 to-violet-600 text-white rounded-sm">Upload Again</button>
                     <table className="min-w-full">
                         <thead>
                             <tr>
@@ -176,17 +166,41 @@ function Form() {
                             ))}
                         </tbody>
                     </table>
+
                     <div className="flex gap-4 mt-4">
-                        <button onClick={() => handleChartChange('line')} className="px-4 py-2 bg-gradient-to-tl from-blue-600 to-violet-600 text-white rounded-md">Line Chart</button>
-                        <button onClick={() => handleChartChange('bar')} className="px-4 py-2 bg-gradient-to-tl from-blue-600 to-violet-600 text-white rounded-md">Bar Chart</button>
+                        <button onClick={() => handleChartChange('line')} className="px-4 py-2 bg-gradient-to-tl from-blue-600 to-violet-600 text-white rounded-sm">Line Chart</button>
+                        <button onClick={() => handleChartChange('bar')} className="px-4 py-2 bg-gradient-to-tl from-blue-600 to-violet-600 text-white rounded-sm">Bar Chart</button>
+                        <button onClick={() => handleChartChange('spline')} className="px-4 py-2 bg-gradient-to-tl from-blue-600 to-violet-600 text-white rounded-sm">Spline Chart</button>
                     </div>
 
-                    <div className="mt-6">
+                    <div className="mt-12">
                         {chartData && chartType === 'line' && (
-                            <Line data={chartData} options={{ responsive: true, plugins: { legend: { position: 'top' }, title: { display: true, text: 'Sales Data' } } }} />
+                            <Line
+                                data={chartData}
+                                options={{
+                                    responsive: true,
+                                    plugins: { legend: { position: 'top' }, title: { display: true, text: 'Graph Data' } }
+                                }}
+                            />
                         )}
                         {chartData && chartType === 'bar' && (
-                            <Bar data={chartData} options={{ responsive: true, plugins: { legend: { position: 'top' }, title: { display: true, text: 'Sales Data' } } }} />
+                            <Bar
+                                data={chartData}
+                                options={{
+                                    responsive: true,
+                                    plugins: { legend: { position: 'top' }, title: { display: true, text: 'Graph Data' } }
+                                }}
+                            />
+                        )}
+                        {chartData && chartType === 'spline' && (
+                            <Line
+                                data={chartData}
+                                options={{
+                                    responsive: true,
+                                    plugins: { legend: { position: 'top' }, title: { display: true, text: 'Graph Data' } },
+                                    elements: { line: { tension: 0.4 } }
+                                }}
+                            />
                         )}
                     </div>
                 </div>
