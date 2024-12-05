@@ -3,15 +3,31 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { ClerkProvider, ClerkLoading, ClerkLoaded } from '@clerk/clerk-react';
+import Loader from './Components/Loader'
+import { AuthProvider } from './Store/Data';
+
+const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
+if (!clerkPubKey) {
+  throw new Error("Missing Publishable Key");
+}
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+  <AuthProvider>
+    <React.StrictMode>
+      <ClerkProvider publishableKey={clerkPubKey} afterSignInUrl="/dashboard" afterSignUpUrl="/dashboard">
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+        <ClerkLoading>
+          <Loader />
+        </ClerkLoading>
+
+        <ClerkLoaded>
+          <App />
+        </ClerkLoaded>
+
+      </ClerkProvider>
+    </React.StrictMode>
+  </AuthProvider>
+);
 reportWebVitals();

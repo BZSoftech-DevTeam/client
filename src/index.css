@@ -1,13 +1,40 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* For WebKit browsers */
+::-webkit-scrollbar {
+    width: 6px; /* Width of the scrollbar */
+    height: 12px; /* Height of the scrollbar for horizontal scrollbar */
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+::-webkit-scrollbar-track {
+    background: #dbdbdb; /* Background color of the track */
+    border-radius: 6px; /* Rounded corners for the track */
 }
+
+::-webkit-scrollbar-thumb {
+    background: #1789FC;/* Color of the scrollbar thumb */
+    border-radius: 6px; /* Rounded corners for the thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #dbdbdb; /* Color of the scrollbar thumb on hover */
+}
+
+.cl-internal-1dauvpw{
+    display: none;
+  }
+  .cl-internal-1hp5nqm{
+    display: none;
+  }
+  .cl-internal-1gaxbcg {
+    display: flex;
+    font-family: "Manrope", sans-serif;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent dark background color */
+    backdrop-filter: blur(10px); /* Adjust the blur amount as needed */
+    color: white; /* Optional: Set text color to white for better contrast */
+  }
