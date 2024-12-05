@@ -29,8 +29,10 @@ function Form() {
     const [fileData, setFileData] = useState(null);
     const [progress, setProgress] = useState(0);
     const [uploading, setUploading] = useState(false);
-    const [chartType, setChartType] = useState('line'); // 'line', 'bar', 'spline'
+    const [chartType, setChartType] = useState('line');
     const [chartData, setChartData] = useState(null);
+    const [chartTitle, setChartTitle] = useState('Graph Data'); // For changing graph name
+    const [legendVisible, setLegendVisible] = useState(true); // For toggling legends visibility
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
@@ -79,11 +81,11 @@ function Form() {
     const generateChartData = (jsonData) => {
         const labels = jsonData[0]?.data?.[0]?.data.map((_, index) => `Month ${index + 1}`);
         const datasets = jsonData.flatMap((category) =>
-            category.data.map((item) => ({
+            category.data.map((item, i) => ({
                 label: item.label,
                 data: item.data,
-                borderColor: category.category === 'Revenue' ? 'blue' : 'orange',
-                backgroundColor: category.category === 'Revenue' ? 'rgba(0, 0, 255, 0.2)' : 'rgba(255, 165, 0, 0.2)',
+                borderColor: item.color || '#0000FF', // Default color for each item (blue)
+                backgroundColor: item.color ? `${item.color}80` : 'rgba(0, 0, 255, 0.2)', // Lighter shade for background
                 borderWidth: 1,
                 fill: false,
             }))
@@ -97,6 +99,17 @@ function Form() {
 
     const handleChartChange = (type) => {
         setChartType(type);
+    };
+
+    const handleLegendToggle = () => {
+        setLegendVisible(!legendVisible);
+    };
+
+    const handleColorChange = (categoryIndex, itemIndex, color) => {
+        const updatedFileData = [...fileData];
+        updatedFileData[categoryIndex].data[itemIndex].color = color; // Update color for specific item
+        setFileData(updatedFileData);
+        generateChartData(updatedFileData); // Re-generate chart data with updated colors
     };
 
     return (
@@ -140,6 +153,48 @@ function Form() {
             {fileData && !uploading && (
                 <div>
                     <button onClick={handleUploadAgain} className="mb-4 px-4 py-2 bg-gradient-to-tl from-blue-600 to-violet-600 text-white rounded-sm">Upload Again</button>
+
+                    {/* Graph Settings */}
+                    <div className="mb-4">
+                        <label className="block mb-2">Graph Title:</label>
+                        <input
+                            type="text"
+                            value={chartTitle}
+                            onChange={(e) => setChartTitle(e.target.value)}
+                            className="p-2 border rounded"
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="block mb-2">Show Legends:</label>
+                        <input
+                            type="checkbox"
+                            checked={legendVisible}
+                            onChange={handleLegendToggle}
+                            className="p-2"
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <h4>Change Category Colors:</h4>
+                        {fileData.map((category, categoryIndex) => (
+                            <div key={categoryIndex}>
+                                <h5>{category.category}</h5>
+                                {category.data.map((item, itemIndex) => (
+                                    <div key={itemIndex} className="flex items-center mb-2">
+                                        <label>{item.label}:</label>
+                                        <input
+                                            type="color"
+                                            value={item.color || '#0000FF'}
+                                            onChange={(e) => handleColorChange(categoryIndex, itemIndex, e.target.value)}
+                                            className="ml-2"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+
                     <table className="min-w-full">
                         <thead>
                             <tr>
@@ -179,7 +234,13 @@ function Form() {
                                 data={chartData}
                                 options={{
                                     responsive: true,
-                                    plugins: { legend: { position: 'top' }, title: { display: true, text: 'Graph Data' } }
+                                    plugins: {
+                                        title: { display: true, text: chartTitle },
+                                        legend: {
+                                            display: legendVisible,
+                                            position: 'top',
+                                        },
+                                    },
                                 }}
                             />
                         )}
@@ -188,19 +249,34 @@ function Form() {
                                 data={chartData}
                                 options={{
                                     responsive: true,
-                                    plugins: { legend: { position: 'top' }, title: { display: true, text: 'Graph Data' } }
+                                    plugins: {
+                                        title: { display: true, text: chartTitle },
+                                        legend: {
+                                            display: legendVisible,
+                                            position: 'top',
+                                        },
+                                    },
                                 }}
                             />
                         )}
                         {chartData && chartType === 'spline' && (
-                            <Line
-                                data={chartData}
-                                options={{
-                                    responsive: true,
-                                    plugins: { legend: { position: 'top' }, title: { display: true, text: 'Graph Data' } },
-                                    elements: { line: { tension: 0.4 } }
-                                }}
-                            />
+                            <div className='border-t-4 border-slate-100 '>
+                                <h1 className='text-3xl font-bold mt-4'>Spline Chart</h1>
+                                <Line
+                                    data={chartData}
+                                    options={{
+                                        responsive: true,
+                                        plugins: {
+                                            title: { display: true, text: chartTitle },
+                                            legend: {
+                                                display: legendVisible,
+                                                position: 'top',
+                                            },
+                                        },
+                                        elements: { line: { tension: 0.4 } }
+                                    }}
+                                />
+                            </div>
                         )}
                     </div>
                 </div>
