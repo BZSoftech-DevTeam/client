@@ -45,9 +45,9 @@ const Navbar = () => {
                   </div>
                 </Link>
               </li>
-              {/* <li className="hover:text-opacity-70 transition duration-200">
+              <li className="hover:text-opacity-70 transition duration-200">
                 <Link to="/demo">Demos</Link>
-              </li> */}
+              </li>
             </ul>
           </div>
           <div className="flex items-center">
