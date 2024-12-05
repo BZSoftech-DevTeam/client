@@ -46,7 +46,10 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="hover:text-opacity-70 transition duration-200">
-                <Link to="/demo">Demos</Link>
+                <Link to="/demo">About Us</Link>
+              </li>
+              <li className="hover:text-opacity-70 transition duration-200">
+                <Link to="/demo">Contact Us</Link>
               </li>
             </ul>
           </div>
@@ -54,6 +57,8 @@ const Navbar = () => {
             <div className="flex items-center">
               <SignedIn>
                 <div className="text-end mx-3">
+                <h1 className="text-xs text-blue-900">{user.fullName}</h1>
+                <h1 className="text-xs text-blue-900">{user.primaryEmailAddress.emailAddress}</h1>
                 </div>
                 <UserButton></UserButton>
               </SignedIn>
